@@ -1,71 +1,61 @@
 <!-- src/lib/components/NodeDetails.svelte -->
 <script lang="ts">
   import type { Role } from "$lib/data/roles";
-  import { attributes } from "$lib/data/attributes";
   
-  export let role: Role | null = null;
-  export let allRoles: Role[] = [];
-  
-  function getConnectedRoles(role: Role): Role[] {
-    return role.adjacentTo
-      .map(id => allRoles.find(r => r.id === id))
-      .filter(Boolean) as Role[];
-  }
-  
-  function getAttributeLabel(key: string): string {
-    const attributeKey = key as keyof typeof attributes;
-    return attributes[attributeKey] || key;
-  }
+  export let role: Role;
+  export let onClose: () => void;
 </script>
 
-{#if role}
-  <div class="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
-    <div class="mb-4">
-      <h3 class="text-xl font-bold text-gray-900">{role.name}</h3>
-      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 mt-2">
+<div class="p-6">
+  <div class="flex justify-between items-start mb-6">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-900 mb-2">{role.name}</h2>
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+        {role.category === 'uiux' ? 'bg-purple-100 text-purple-800' : 
+         role.category === 'engineering' ? 'bg-blue-100 text-blue-800' :
+         role.category === 'systems' ? 'bg-green-100 text-green-800' :
+         role.category === 'ai' ? 'bg-red-100 text-red-800' :
+         role.category === 'gamedev' ? 'bg-yellow-100 text-yellow-800' :
+         'bg-gray-100 text-gray-800'}">
         {role.category}
       </span>
     </div>
-    
-    {#if role.description}
-      <p class="text-gray-600 text-sm mb-4">{role.description}</p>
-    {/if}
-    
-    <div class="mb-6">
-      <h4 class="font-medium text-gray-700 mb-2">Attributes</h4>
-      <div class="flex flex-wrap gap-2">
-        {#each Object.entries(role.attributes) as [key, value]}
-          <div class="flex items-center space-x-1">
-            <div class={`w-3 h-3 rounded-full ${value ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-            <span class="text-sm text-gray-600">{getAttributeLabel(key)}: {value ? '✓' : '✗'}</span>
-          </div>
-        {/each}
-      </div>
-    </div>
-    
-    <div>
-      <h4 class="font-medium text-gray-700 mb-2">
-        Connected to {role.adjacentTo.length} role{role.adjacentTo.length !== 1 ? 's' : ''}
-      </h4>
-      <div class="space-y-3">
-        {#each getConnectedRoles(role) as connectedRole}
-          <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-            <div>
-              <p class="font-medium text-gray-900">{connectedRole.name}</p>
-              <p class="text-sm text-gray-500">{connectedRole.category}</p>
-            </div>
-            <div class="flex space-x-2">
-              {#each Object.entries(connectedRole.attributes) as [key, value]}
-                {#if value}
-                  <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">
-                    {getAttributeLabel(key)}
-                  </span>
-                {/if}
-              {/each}
-            </div>
-          </div>
-        {/each}
-      </div>
+    <button
+      on:click={onClose}
+      class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+      aria-label="Close"
+    >
+      <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <div class="mb-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-3">Attributes</h3>
+    <div class="flex flex-wrap gap-3">
+      {#if role.attributes.highOrder}
+        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm bg-yellow-100 text-yellow-800">
+          <span class="mr-1">⭐</span> High-order
+        </span>
+      {/if}
+      {#if role.attributes.aiLeverage}
+        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm bg-red-100 text-red-800">
+          <span class="mr-1">🤖</span> AI-leverageable
+        </span>
+      {/if}
+      {#if role.attributes.portable}
+        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm bg-blue-100 text-blue-800">
+          <span class="mr-1">📦</span> Portable
+        </span>
+      {/if}
     </div>
   </div>
-{/if}
+
+  {#if role.description}
+    <div class="mb-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-3">Description</h3>
+      <p class="text-gray-600">{role.description}</p>
+    </div>
+  {/if}
+</div>
