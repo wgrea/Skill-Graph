@@ -1,11 +1,11 @@
 <!-- src/routes/+page.svelte -->
 <script lang="ts">
-  import { roles } from "$lib/data/roles";
+  import { roles } from "$lib/data/roles/index";
   import { attributes } from "$lib/data/attributes";
   import Graph from '$lib/components/Graph.svelte';
   import Filters from '$lib/components/Filters.svelte';
-  import type { Role } from "$lib/data/roles";
-  import AdjacencyTable from '$lib/components/AdjacencyTable.svelte';
+  import type { Role } from "$lib/data/roles/index";
+  import AdjacencyTable from '$lib/components/AdjacencyTable.svelte'; // This should work if it has default export
   import NodeDetails from '$lib/components/NodeDetails.svelte';
   
   // Initialize filters based on attributes

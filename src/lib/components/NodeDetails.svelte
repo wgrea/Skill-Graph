@@ -2,7 +2,13 @@
 <script lang="ts">
   import type { Role } from "$lib/data/roles";
   
-  export let role: Role;
+  // Type assertion to help TypeScript understand these are optional properties
+  type RoleWithOptionalProps = Role & {
+    prerequisites?: string[];
+    isSpecialization?: boolean;
+  };
+  
+  export let role: RoleWithOptionalProps;
   export let onClose: () => void;
 </script>
 
@@ -51,6 +57,24 @@
       {/if}
     </div>
   </div>
+
+  <!-- Use optional chaining to safely access optional properties -->
+  {#if role.prerequisites?.length}
+    <div class="mb-6">
+      <h3 class="text-lg font-semibold mb-3">Prerequisites</h3>
+      <div class="flex flex-wrap gap-2">
+        {#each role.prerequisites as prereq}
+          <span class="px-3 py-1 bg-gray-100 text-sm rounded-full">{prereq}</span>
+        {/each}
+      </div>
+    </div>
+  {/if}
+
+  {#if role.isSpecialization}
+    <span class="inline-flex px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full mb-4">
+      Specialization
+    </span>
+  {/if}
 
   {#if role.description}
     <div class="mb-6">
