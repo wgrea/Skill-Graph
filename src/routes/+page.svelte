@@ -130,11 +130,15 @@
     </div>
 
     {#if showAdjacencyTable}
-      <AdjacencyTable {roles} />
+      <AdjacencyTable 
+        filteredRoles={filteredRoles} 
+        onRoleSelect={handleRoleSelect} 
+      />
     {/if}
   </div>
 </main>
 
+<!-- In your +page.svelte - Update the modal section -->
 {#if selectedRole}
   <div class="fixed inset-0 z-50" role="dialog" aria-modal="true">
     <!-- Modal backdrop as a button for accessibility -->
@@ -156,6 +160,9 @@
         <NodeDetails 
           role={selectedRole}
           onClose={() => selectedRole = null}
+          onRoleSelect={(role) => {
+            selectedRole = role;
+          }}
         />
       </div>
     </div>

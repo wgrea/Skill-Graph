@@ -1,17 +1,25 @@
 // src/lib/data/roles/index.ts
+// src/lib/data/roles/index.ts
 export interface Role {
   id: string;
   name: string;
   category: string;
-  isSpecialization?: boolean;    // MUST HAVE THIS LINE
-  prerequisites?: string[];      // MUST HAVE THIS LINE
+  isSpecialization?: boolean;
+  prerequisites?: string[];
+  adjacentTo: string[];
+  description?: string;
   attributes: {
     highOrder: boolean;
     aiLeverage: boolean;
     portable: boolean;
   };
-  adjacentTo: string[];
-  description?: string;
+  details?: {  // NEW: Rich explanations
+    highOrder?: string;      // "Ethical journey synthesis, mental model prioritization"
+    aiLeverage?: string;     // "Auto personas (Galileo AI), A/B test synthesis"
+    portable?: string;       // "Figma cloud (92%), async handoffs" 
+    nonPortable?: string;    // Shows when portable=false: "In-person workshops"
+    mediumNotes?: string;    // Grey area explanations
+  };
 }
 
 // Import individual role files

@@ -136,17 +136,21 @@
       } as LayoutOptions
     });
 
-    // Add click handler
+    // Add click handler - ADD THESE console.logs
     cy.on('tap', 'node', function(evt: any) {
+      console.log('🔴 GRAPH NODE CLICKED!', evt.target.data('roleData'));  // ← ADD
       const node = evt.target;
       const roleData = node.data('roleData');
       if (roleData) {
+        console.log('🔵 CALLING onRoleSelect:', roleData.name);  // ← ADD
         onRoleSelect(roleData);
         
         // Highlight this node and its connections
         cy?.elements().removeClass('highlighted');
         node.addClass('highlighted');
         node.neighborhood().addClass('highlighted');
+      } else {
+        console.log('❌ NO roleData found!');  // ← ADD
       }
     });
 

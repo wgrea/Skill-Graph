@@ -1,15 +1,11 @@
 <!-- src/lib/components/NodeDetails.svelte -->
 <script lang="ts">
   import type { Role } from "$lib/data/roles";
+  import { getRoleById } from '$lib/data/roles'; // Import here
   
-  // Type assertion to help TypeScript understand these are optional properties
-  type RoleWithOptionalProps = Role & {
-    prerequisites?: string[];
-    isSpecialization?: boolean;
-  };
-  
-  export let role: RoleWithOptionalProps;
+  export let role: Role;
   export let onClose: () => void;
+  export let onRoleSelect: (role: Role) => void; // Add this prop
 </script>
 
 <div class="p-6">
@@ -37,23 +33,71 @@
     </button>
   </div>
 
+  {#if role.description}
+    <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+      <h3 class="text-lg font-semibold text-gray-900 mb-2">Description</h3>
+      <p class="text-gray-700 leading-relaxed">{role.description}</p>
+    </div>
+  {/if}
+
   <div class="mb-6">
-    <h3 class="text-lg font-semibold text-gray-900 mb-3">Attributes</h3>
-    <div class="flex flex-wrap gap-3">
-      {#if role.attributes.highOrder}
-        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm bg-yellow-100 text-yellow-800">
-          <span class="mr-1">⭐</span> High-order
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Attributes</h3>
+    
+    <!-- ⭐ High-order -->
+    <div class="mb-4 p-4 bg-gradient-to-r from-yellow-50 to-yellow-100 border-l-4 border-yellow-400 rounded-r-lg">
+      <div class="flex items-center mb-2">
+        <span class="text-2xl mr-3">⭐</span>
+        <span class="font-semibold text-gray-900 text-lg">
+          {role.attributes.highOrder ? 'High-order' : 'Task-level'}
+          {#if !role.attributes.highOrder && role.details?.highOrder}
+            <span class="ml-2 px-2 py-1 bg-yellow-200 text-yellow-800 text-xs rounded-full font-medium">(Limited)</span>
+          {/if}
         </span>
+      </div>
+      {#if role.details?.highOrder}
+        <p class="text-gray-700 leading-relaxed">{role.details.highOrder}</p>
+      {:else}
+        <p class="text-gray-500 text-sm italic">
+          {role.attributes.highOrder ? 'High-order thinking required' : 'Task-focused work'}
+        </p>
       {/if}
-      {#if role.attributes.aiLeverage}
-        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm bg-red-100 text-red-800">
-          <span class="mr-1">🤖</span> AI-leverageable
+    </div>
+
+    <!-- 🤖 AI-leverageable -->
+    <div class="mb-4 p-4 bg-gradient-to-r {role.attributes.aiLeverage ? 'from-red-50 to-red-100 border-red-400' : 'from-gray-50 to-gray-100 border-gray-400'} border-l-4 rounded-r-lg">
+      <div class="flex items-center mb-2">
+        <span class="text-2xl mr-3">🤖</span>
+        <span class="font-semibold text-gray-900 text-lg">
+          {role.attributes.aiLeverage ? 'AI-leverageable' : 'AI-resistant'}
         </span>
+      </div>
+      {#if role.details?.aiLeverage}
+        <p class="text-gray-700 leading-relaxed">{role.details.aiLeverage}</p>
+      {:else}
+        <p class="text-gray-500 text-sm italic">
+          {role.attributes.aiLeverage ? 'Can leverage AI tools' : 'Limited AI tool integration'}
+        </p>
       {/if}
-      {#if role.attributes.portable}
-        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm bg-blue-100 text-blue-800">
-          <span class="mr-1">📦</span> Portable
+    </div>
+
+    <!-- 📦 Portable -->
+    <div class="mb-6 p-4 bg-gradient-to-r {role.attributes.portable ? 'from-blue-50 to-blue-100 border-blue-400' : 'from-orange-50 to-orange-100 border-orange-400'} border-l-4 rounded-r-lg">
+      <div class="flex items-center mb-2">
+        <span class="text-2xl mr-3">📦</span>
+        <span class="font-semibold text-gray-900 text-lg">
+          {role.attributes.portable ? 'Portable' : 'Location-bound'}
         </span>
+      </div>
+      {#if role.attributes.portable && role.details?.portable}
+        <p class="text-gray-700 leading-relaxed">{role.details.portable}</p>
+      {:else if role.details?.nonPortable}
+        <div>
+          <p class="text-gray-700 leading-relaxed">{role.details.nonPortable}</p>
+        </div>
+      {:else}
+        <p class="text-gray-500 text-sm italic">
+          {role.attributes.portable ? 'Can work remotely' : 'Requires physical presence'}
+        </p>
       {/if}
     </div>
   </div>
@@ -76,10 +120,24 @@
     </span>
   {/if}
 
-  {#if role.description}
-    <div class="mb-6">
-      <h3 class="text-lg font-semibold text-gray-900 mb-3">Description</h3>
-      <p class="text-gray-600">{role.description}</p>
+  <!-- Connected Roles -->
+  {#if role.adjacentTo.length}
+    <div class="mt-6 pt-6 border-t border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-900 mb-3">Connected Roles</h3>
+      <div class="flex flex-wrap gap-2">
+        {#each role.adjacentTo as adjacentId}
+          {#if getRoleById(adjacentId)}
+            <button
+              type="button"
+              on:click={() => onRoleSelect(getRoleById(adjacentId)!)}
+              on:keydown={(e) => e.key === 'Enter' && onRoleSelect(getRoleById(adjacentId)!)}
+              class="px-3 py-1 bg-blue-50 text-blue-700 text-sm rounded-full hover:bg-blue-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300"
+            >
+              {getRoleById(adjacentId)?.name}
+            </button>
+          {/if}
+        {/each}
+      </div>
     </div>
   {/if}
 </div>

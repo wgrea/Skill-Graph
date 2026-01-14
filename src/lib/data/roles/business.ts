@@ -1,5 +1,4 @@
 // src/lib/data/roles/business.ts
-// In uiux.ts, engineering.ts, etc.
 import type { Role } from './index';
 
 export const roles: Role[] = [
@@ -14,6 +13,11 @@ export const roles: Role[] = [
       aiLeverage: true,
       portable: true,
     },
+    details: {
+      highOrder: "Product vision synthesis, market opportunity analysis, stakeholder alignment frameworks",
+      aiLeverage: "Automated user research analysis, predictive roadmap planning, competitive intelligence tools",
+      portable: "Remote team leadership, digital collaboration tools, async stakeholder communication"
+    },
     adjacentTo: ["product-designer", "business-analyst", "ai-product-manager"]
   },
   {
@@ -26,6 +30,11 @@ export const roles: Role[] = [
       highOrder: true,
       aiLeverage: true,
       portable: true,
+    },
+    details: {
+      highOrder: "Requirement synthesis, process optimization frameworks, business value mapping",
+      aiLeverage: "Automated data analysis, predictive modeling, process mining tools",
+      portable: "Digital documentation tools, remote stakeholder interviews, cloud analytics platforms"
     },
     adjacentTo: ["product-manager", "operations"]
   },
@@ -40,6 +49,11 @@ export const roles: Role[] = [
       aiLeverage: true,
       portable: false,
     },
+    details: {
+      highOrder: "Process execution, workflow coordination, resource allocation",
+      aiLeverage: "Automated scheduling, predictive maintenance, inventory optimization",
+      nonPortable: "Physical facility management, in-person equipment maintenance, on-site logistics"
+    },
     adjacentTo: ["business-analyst", "cx-strategist"]
   },
   {
@@ -52,6 +66,11 @@ export const roles: Role[] = [
       highOrder: true,
       aiLeverage: true,
       portable: true,
+    },
+    details: {
+      highOrder: "Customer journey orchestration, experience ecosystem design, emotional mapping",
+      aiLeverage: "Sentiment analysis automation, predictive customer behavior modeling, journey optimization",
+      portable: "Digital customer feedback tools, remote user interviews, cloud analytics dashboards"
     },
     adjacentTo: ["ux-designer", "operations"]
   }
