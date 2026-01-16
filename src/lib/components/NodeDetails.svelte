@@ -1,11 +1,12 @@
 <!-- src/lib/components/NodeDetails.svelte -->
 <script lang="ts">
   import type { Role } from "$lib/data/roles";
-  import { getRoleById } from '$lib/data/roles'; // Import here
+  import { getRoleById } from '$lib/data/roles';
+  import { networkingPlatforms } from '$lib/data/roles'; // ADD THIS IMPORT
   
   export let role: Role;
   export let onClose: () => void;
-  export let onRoleSelect: (role: Role) => void; // Add this prop
+  export let onRoleSelect: (role: Role) => void;
 </script>
 
 <div class="p-6">
@@ -102,7 +103,6 @@
     </div>
   </div>
 
-  <!-- Use optional chaining to safely access optional properties -->
   {#if role.prerequisites?.length}
     <div class="mb-6">
       <h3 class="text-lg font-semibold mb-3">Prerequisites</h3>
@@ -120,7 +120,6 @@
     </span>
   {/if}
 
-  <!-- Connected Roles -->
   {#if role.adjacentTo.length}
     <div class="mt-6 pt-6 border-t border-gray-200">
       <h3 class="text-lg font-semibold text-gray-900 mb-3">Connected Roles</h3>
@@ -138,6 +137,47 @@
           {/if}
         {/each}
       </div>
+    </div>
+  {/if}
+
+  {#if role.networking}
+    <div class="mt-6 pt-6 border-t border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+        <span class="text-xl mr-2">🤝</span> Networking
+      </h3>
+      
+      <!-- Primary Platforms -->
+      <div class="mb-4">
+        <h4 class="text-sm font-semibold text-gray-700 mb-2">Where to Network:</h4>
+        <div class="flex flex-wrap gap-2">
+          {#each role.networking.primaryPlatforms as platform}
+            {#if networkingPlatforms[platform]}
+              <div class="flex items-center px-3 py-2 bg-blue-50 rounded-lg border border-blue-200">
+                <span class="text-lg mr-2">{networkingPlatforms[platform].icon}</span>
+                <div>
+                  <div class="font-medium text-sm text-gray-900">{networkingPlatforms[platform].name}</div>
+                  <div class="text-xs text-gray-600">{networkingPlatforms[platform].description}</div>
+                </div>
+              </div>
+            {/if}
+          {/each}
+        </div>
+      </div>
+      
+      <!-- Networking Tips -->
+      {#if role.networking.networkingTips}
+        <div class="mb-4 p-3 bg-gradient-to-r from-green-50 to-emerald-100 rounded-lg border border-green-200">
+          <h4 class="text-sm font-semibold text-gray-700 mb-1">Networking Tips:</h4>
+          <p class="text-gray-700 text-sm">{role.networking.networkingTips}</p>
+        </div>
+      {/if}
+      
+      <!-- Community Notes -->
+      {#if role.networking.communityNotes}
+        <div class="text-sm text-gray-600 p-3 bg-gray-50 rounded-lg">
+          <span class="font-medium">Community Notes:</span> {role.networking.communityNotes}
+        </div>
+      {/if}
     </div>
   {/if}
 </div>

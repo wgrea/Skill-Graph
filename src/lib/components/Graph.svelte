@@ -1,4 +1,4 @@
-<!-- src/lib/data/components/Graph.svelte -->
+<!-- src/lib/components/Graph.svelte -->
 <script lang="ts">
   import cytoscape from "cytoscape";
   import type { Core, ElementDefinition, LayoutOptions } from "cytoscape";
@@ -67,34 +67,91 @@
       container,
       elements,
       style: [
+        // Replace the demand badge styles with functions:
         {
           selector: "node",
           style: {
-            "background-color": function(ele: any) {
-              const category = ele.data("category");
-              const colors: Record<string, string> = {
-                uiux: "#4f46e5",
-                engineering: "#10b981",
-                systems: "#f59e0b",
-                ai: "#8b5cf6",
-                gamedev: "#ef4444",
-                business: "#3b82f6"
-              };
-              return colors[category] || "#6b7280";
+            "content": function(ele: any) {
+              const demand = ele.data("attributes")?.demand;
+              if (demand === 'high') return "🔥";
+              if (demand === 'medium') return "📈";
+              return "";
             },
-            "label": "data(label)",
-            "color": "white",
-            "text-valign": "center",
-            "text-halign": "center",
-            "font-size": "12px",
-            "width": "label",
-            "height": "label",
-            "padding": "10px",
-            "border-width": 2,
-            "border-color": "#fff",
-            "shape": "round-rectangle"
+            "text-margin-y": function(ele: any) {
+              const demand = ele.data("attributes")?.demand;
+              return demand ? -15 : 0;
+            },
+            "text-outline-color": "white",
+            "text-outline-width": 2
           }
         },
+        // DEMAND STYLES
+        {
+          selector: "node[attributes.demand='high']",
+          style: {
+            "border-width": 4,
+            "border-color": "#ef4444",
+            "border-style": "solid",
+            "width": function(ele: any) {
+              const label = ele.data("label") || "";
+              return Math.max(label.length * 10 + 50, 70);
+            },
+            "height": function(ele: any) {
+              const label = ele.data("label") || "";
+              return Math.max(label.length * 10 + 50, 70);
+            },
+            "font-size": "13px",
+            "font-weight": "bold"
+          }
+        },
+        {
+          selector: "node[attributes.demand='medium']",
+          style: {
+            "border-width": 3,
+            "border-color": "#f59e0b",
+            "border-style": "solid"
+          }
+        },
+        {
+          selector: "node[attributes.demand='low']",
+          style: {
+            "border-width": 2,
+            "border-color": "#6b7280",
+            "border-style": "dashed",
+            "opacity": 0.8
+          }
+        },
+        // STRENGTH STYLES
+        {
+          selector: "node[attributes.strength='3']",
+          style: {
+            "width": function(ele: any) {
+              const label = ele.data("label") || "";
+              return Math.max(label.length * 8 + 40, 60);
+            },
+            "height": function(ele: any) {
+              const label = ele.data("label") || "";
+              return Math.max(label.length * 8 + 40, 60);
+            },
+            "font-size": "14px",
+            "font-weight": "bold"
+          }
+        },
+        {
+          selector: "node[attributes.strength='2']",
+          style: {
+            "width": function(ele: any) {
+              const label = ele.data("label") || "";
+              return Math.max(label.length * 7 + 30, 50);
+            },
+            "height": function(ele: any) {
+              const label = ele.data("label") || "";
+              return Math.max(label.length * 7 + 30, 50);
+            },
+            "font-size": "12px"
+          }
+        },
+        // HIGH ORDER STYLE
         {
           selector: "node[?attributes.highOrder]",
           style: {
@@ -102,6 +159,29 @@
             "border-width": 3
           }
         },
+        // DEMAND BADGES (ICONS)
+        {
+          selector: "node[attributes.demand='high']::after",
+          style: {
+            "content": "🔥",
+            "font-size": "14px",
+            "color": "#ef4444",
+            "text-outline-color": "white",
+            "text-outline-width": 2
+          }
+        },
+        {
+          selector: "node[attributes.demand='medium']::after",
+          style: {
+            "content": "📈",
+            "font-size": "12px",
+            "color": "#f59e0b",
+            // FIX: Use text-outline instead of text-shadow
+            "text-outline-color": "white",
+            "text-outline-width": 2
+          }
+        },
+        // EDGE STYLES
         {
           selector: "edge",
           style: {
@@ -136,21 +216,25 @@
       } as LayoutOptions
     });
 
-    // Add click handler - ADD THESE console.logs
+    // Click handler
     cy.on('tap', 'node', function(evt: any) {
-      console.log('🔴 GRAPH NODE CLICKED!', evt.target.data('roleData'));  // ← ADD
       const node = evt.target;
-      const roleData = node.data('roleData');
-      if (roleData) {
-        console.log('🔵 CALLING onRoleSelect:', roleData.name);  // ← ADD
-        onRoleSelect(roleData);
+      console.log('🔴 Node clicked:', node.id(), 'Data:', node.data());
+      
+      // Get the actual role from your roles array
+      const roleId = node.id();
+      const role = roles.find(r => r.id === roleId);
+      
+      if (role) {
+        console.log('🔵 Calling onRoleSelect for:', role.name);
+        onRoleSelect(role);
         
-        // Highlight this node and its connections
+        // Highlight logic
         cy?.elements().removeClass('highlighted');
         node.addClass('highlighted');
         node.neighborhood().addClass('highlighted');
       } else {
-        console.log('❌ NO roleData found!');  // ← ADD
+        console.error('❌ Role not found for id:', roleId);
       }
     });
 

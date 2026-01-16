@@ -58,6 +58,34 @@
     {/each}
   </div>
   
+  <!-- Demand Filter - MOVED HERE, OUTSIDE THE LOOP -->
+  <div class="mt-6 pt-6 border-t border-gray-200">
+    <h4 class="text-sm font-semibold text-gray-700 mb-3">Market Demand</h4>
+    <div class="flex flex-wrap gap-2">
+      <button
+        type="button"
+        class={`px-3 py-1.5 text-sm rounded-full border ${filters.demandHigh ? 'bg-red-100 border-red-300 text-red-700' : 'bg-gray-100 border-gray-200 text-gray-600'}`}
+        on:click={() => toggleFilter('demandHigh')}
+      >
+        🔥 High Demand
+      </button>
+      <button
+        type="button"
+        class={`px-3 py-1.5 text-sm rounded-full border ${filters.demandMedium ? 'bg-yellow-100 border-yellow-300 text-yellow-700' : 'bg-gray-100 border-gray-200 text-gray-600'}`}
+        on:click={() => toggleFilter('demandMedium')}
+      >
+        📈 Medium Demand
+      </button>
+      <button
+        type="button"
+        class={`px-3 py-1.5 text-sm rounded-full border ${filters.demandLow ? 'bg-gray-100 border-gray-300 text-gray-700' : 'bg-gray-100 border-gray-200 text-gray-600'}`}
+        on:click={() => toggleFilter('demandLow')}
+      >
+        📉 Lower Demand
+      </button>
+    </div>
+  </div>
+  
   <div class="mt-4 text-sm text-gray-500">
     <p>Showing roles with: {Object.entries(filters).filter(([_, value]) => value).map(([key]) => getAttributeLabel(key)).join(', ') || 'All attributes'}</p>
   </div>
